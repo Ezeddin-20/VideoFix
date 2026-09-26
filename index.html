@@ -121,8 +121,7 @@
     { abi: "armeabi-v7a", name: "app-armeabi-v7a-release.apk" },
     { abi: "universal",   name: "app-universal-release.apk" },
   ];
-  // Only these are listed under "other devices"; the x86 builds are still published (the
-  // in-app updater and emulators use them) but would just confuse people on this page.
+  // Listed under "if the app doesn't work"; arm64 is the main button.
   const LISTED = ["armeabi-v7a", "universal"];
 
   const T = {
@@ -133,9 +132,9 @@
       forPhones: "لمعظم هواتف أندرويد",
       openOnPhone: "أو افتح هذه الصفحة مباشرة من هاتفك:",
       scan: "امسح الرمز بكاميرا الهاتف",
-      otherDevices: "إذا لم يعمل التطبيق",
+      otherDevices: "ظهرت رسالة «التطبيق غير مثبّت»؟",
       get: "تنزيل",
-      desc: { "armeabi-v7a": "نسخة للهواتف القديمة", "universal": "نسخة لكل الأجهزة (حجم أكبر)" },
+      desc: { "armeabi-v7a": "نزّل هذه النسخة (للهواتف القديمة)", "universal": "أو هذه — تعمل على كل الأجهزة (حجم أكبر)" },
       installTitle: "طريقة التثبيت",
       step1: "اضغط على زر التنزيل وانتظر حتى ينتهي.",
       step2: "افتح الملف. إذا طلب الهاتف ذلك، اسمح بـ «التثبيت من هذا المصدر».",
@@ -165,9 +164,9 @@
       forPhones: "For most Android phones",
       openOnPhone: "Or open this page directly on your phone:",
       scan: "Scan with your phone's camera",
-      otherDevices: "If the app doesn't work",
+      otherDevices: "Seeing “App not installed”?",
       get: "Download",
-      desc: { "armeabi-v7a": "Version for older phones", "universal": "Version for every device (larger)" },
+      desc: { "armeabi-v7a": "Get this version (older phones)", "universal": "Or this one — works on every device (larger)" },
       installTitle: "How to install",
       step1: "Tap the download button and wait until it finishes.",
       step2: "Open the file. If your phone asks, allow “Install from this source”.",
@@ -197,9 +196,9 @@
       forPhones: "Für die meisten Android-Handys",
       openOnPhone: "Oder öffne diese Seite direkt auf deinem Handy:",
       scan: "Mit der Handy-Kamera scannen",
-      otherDevices: "Falls die App nicht läuft",
+      otherDevices: "Meldung „App nicht installiert“?",
       get: "Laden",
-      desc: { "armeabi-v7a": "Version für ältere Handys", "universal": "Version für alle Geräte (größer)" },
+      desc: { "armeabi-v7a": "Lade diese Version (ältere Handys)", "universal": "Oder diese – läuft auf allen Geräten (größer)" },
       installTitle: "So installierst du es",
       step1: "Tippe auf den Download-Knopf und warte, bis er fertig ist.",
       step2: "Öffne die Datei. Falls das Handy fragt, erlaube „Aus dieser Quelle installieren“.",
