@@ -49,6 +49,10 @@
   h2 { font-size: 18px; margin: 32px 0 10px; }
   ol, .features { padding-inline-start: 22px; margin: 0; }
   ol li, .features li { margin: 6px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+  .feature { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
+  .feature b { display: block; margin-bottom: 2px; }
+  .feature span { color: var(--muted); font-size: 15px; }
   footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 40px; }
   footer a { color: inherit; }
   [hidden] { display: none !important; }
@@ -76,8 +80,10 @@
       <a class="download" id="mainLink" href="#" data-t="download"></a>
       <div class="meta" id="mainMeta"></div>
     </div>
-    <!-- Anything else: point to a phone -->
+    <!-- Anything else: direct download plus a QR code to open the page on a phone -->
     <div id="other" hidden>
+      <a class="download" id="desktopLink" href="#" data-t="download"></a>
+      <div class="meta" id="desktopMeta"></div>
       <p data-t="openOnPhone"></p>
       <div id="qr" aria-hidden="true"></div>
       <div class="meta" data-t="scan"></div>
@@ -97,12 +103,7 @@
   </ol>
 
   <h2 data-t="featuresTitle"></h2>
-  <ul class="features">
-    <li data-t="f1"></li>
-    <li data-t="f2"></li>
-    <li data-t="f3"></li>
-    <li data-t="f4"></li>
-  </ul>
+  <div class="grid" id="features"></div>
 
   <footer>
     <a href="https://github.com/Ezeddin-20/VideoFix/releases" data-t="allVersions"></a>
@@ -128,7 +129,9 @@
       tagline: "نزّل الفيديوهات، قصّها وقسّمها، واستخرج الصوت — على أندرويد.",
       download: "تنزيل VideoFix",
       forDevice: "مناسب لهاتفك",
-      openOnPhone: "VideoFix تطبيق لهواتف أندرويد. افتح هذه الصفحة من هاتفك للتنزيل.",
+      started: "بدأ التنزيل تلقائياً — إذا لم يبدأ، اضغط الزر.",
+      forPhones: "لمعظم هواتف أندرويد",
+      openOnPhone: "أو افتح هذه الصفحة مباشرة من هاتفك:",
       scan: "امسح الرمز بكاميرا الهاتف",
       otherDevices: "أجهزة أخرى / كل الملفات",
       desc: { "arm64-v8a": "معظم الهواتف الحديثة", "armeabi-v7a": "هواتف قديمة (32-بت)", "x86_64": "محاكي 64-بت", "x86": "محاكي 32-بت", "universal": "كل الأجهزة (حجم كبير)" },
@@ -137,10 +140,20 @@
       step2: "افتح الملف. إذا طلب الهاتف ذلك، اسمح بـ «التثبيت من هذا المصدر».",
       step3: "اضغط «تثبيت». التحديثات القادمة تصلك من داخل التطبيق.",
       featuresTitle: "ماذا يفعل VideoFix؟",
-      f1: "تنزيل من يوتيوب وتيك توك وإنستغرام وفيسبوك وغيرها — حتى قوائم التشغيل كاملة.",
-      f2: "اختيار الجودة، أو تنزيل الصوت فقط.",
-      f3: "قص الفيديو وتقسيمه واستخراج الصوت منه.",
-      f4: "تحديثات تلقائية من داخل التطبيق.",
+      features: [
+        ["تنزيل من كل مكان", "يوتيوب وتيك توك وإنستغرام وفيسبوك ومئات المواقع الأخرى."],
+        ["قوائم تشغيل كاملة", "الصق رابط قائمة واختر: كل الفيديوهات أو فيديو واحد فقط."],
+        ["الجودة التي تريدها", "جودة عالية أو متوسطة أو منخفضة — أو الصوت فقط."],
+        ["صيغ وترجمات", "MP4 أو MKV أو WEBM، مع تنزيل الترجمة إذا أردت."],
+        ["سريع وسهل", "انسخ الرابط وافتح التطبيق فيتعرّف عليه، أو شارك الفيديو مباشرة إلى VideoFix."],
+        ["التنزيل في الخلفية", "استمر في استخدام هاتفك، والتقدّم يظهر في الإشعارات."],
+        ["قص الفيديو", "احتفظ بالجزء الذي تريده فقط واحفظه أو شاركه."],
+        ["تقسيم الفيديو", "قسّم الفيديو الطويل إلى أجزاء — مثالي لحالات واتساب."],
+        ["استخراج الصوت", "حوّل أي فيديو إلى ملف صوتي."],
+        ["مكتبة ومشغّل", "كل فيديوهاتك في مكان واحد مع مشغّل مدمج."],
+        ["وصف صوتي بالذكاء الاصطناعي", "Gemini يصف الفيديو للمكفوفين وضعاف البصر."],
+        ["عربي وإنجليزي وألماني", "مع الوضع الليلي والتحديثات التلقائية."],
+      ],
       allVersions: "كل الإصدارات على GitHub",
       version: "الإصدار",
     },
@@ -148,7 +161,9 @@
       tagline: "Download videos, trim and split them, extract the audio — on Android.",
       download: "Download VideoFix",
       forDevice: "Picked for your phone",
-      openOnPhone: "VideoFix is an Android app. Open this page on your phone to download it.",
+      started: "Download started automatically — if not, tap the button.",
+      forPhones: "For most Android phones",
+      openOnPhone: "Or open this page directly on your phone:",
       scan: "Scan with your phone's camera",
       otherDevices: "Other devices / all files",
       desc: { "arm64-v8a": "Most modern phones", "armeabi-v7a": "Older phones (32-bit)", "x86_64": "Emulator 64-bit", "x86": "Emulator 32-bit", "universal": "Every device (large)" },
@@ -157,10 +172,20 @@
       step2: "Open the file. If your phone asks, allow “Install from this source”.",
       step3: "Tap “Install”. Future updates arrive inside the app.",
       featuresTitle: "What does VideoFix do?",
-      f1: "Download from YouTube, TikTok, Instagram, Facebook and more — even whole playlists.",
-      f2: "Choose the quality, or download just the audio.",
-      f3: "Trim, split and extract audio from your videos.",
-      f4: "Automatic updates from inside the app.",
+      features: [
+        ["Download from anywhere", "YouTube, TikTok, Instagram, Facebook and hundreds more sites."],
+        ["Whole playlists", "Paste a playlist link and choose: every video or just one."],
+        ["Your quality", "High, medium or low — or just the audio."],
+        ["Formats & subtitles", "MP4, MKV or WEBM, with subtitles if you want them."],
+        ["Fast and simple", "Copy a link and open the app — it spots it. Or share a video straight to VideoFix."],
+        ["Background downloads", "Keep using your phone; progress shows in the notifications."],
+        ["Trim", "Keep only the part you want, then save or share it."],
+        ["Split", "Cut long videos into parts — perfect for WhatsApp status."],
+        ["Extract audio", "Turn any video into an audio file."],
+        ["Library & player", "All your videos in one place with a built-in player."],
+        ["AI audio description", "Gemini describes the video for blind and low-vision viewers."],
+        ["Arabic, English, German", "Plus dark mode and automatic updates."],
+      ],
       allVersions: "All versions on GitHub",
       version: "Version",
     },
@@ -168,7 +193,9 @@
       tagline: "Videos herunterladen, schneiden, teilen und den Ton extrahieren – auf Android.",
       download: "VideoFix herunterladen",
       forDevice: "Passend für dein Handy",
-      openOnPhone: "VideoFix ist eine Android-App. Öffne diese Seite auf deinem Handy, um sie herunterzuladen.",
+      started: "Der Download startet automatisch – falls nicht, tippe auf den Knopf.",
+      forPhones: "Für die meisten Android-Handys",
+      openOnPhone: "Oder öffne diese Seite direkt auf deinem Handy:",
       scan: "Mit der Handy-Kamera scannen",
       otherDevices: "Andere Geräte / alle Dateien",
       desc: { "arm64-v8a": "Die meisten aktuellen Handys", "armeabi-v7a": "Ältere Handys (32-Bit)", "x86_64": "Emulator 64-Bit", "x86": "Emulator 32-Bit", "universal": "Alle Geräte (groß)" },
@@ -177,10 +204,20 @@
       step2: "Öffne die Datei. Falls das Handy fragt, erlaube „Aus dieser Quelle installieren“.",
       step3: "Tippe auf „Installieren“. Künftige Updates kommen direkt in der App.",
       featuresTitle: "Was kann VideoFix?",
-      f1: "Download von YouTube, TikTok, Instagram, Facebook und mehr – auch ganze Playlists.",
-      f2: "Qualität wählen oder nur den Ton herunterladen.",
-      f3: "Videos schneiden, teilen und den Ton extrahieren.",
-      f4: "Automatische Updates direkt in der App.",
+      features: [
+        ["Von überall herunterladen", "YouTube, TikTok, Instagram, Facebook und Hunderte weitere Seiten."],
+        ["Ganze Playlists", "Playlist-Link einfügen und wählen: alle Videos oder nur eins."],
+        ["Deine Qualität", "Hoch, mittel oder niedrig – oder nur der Ton."],
+        ["Formate & Untertitel", "MP4, MKV oder WEBM, auf Wunsch mit Untertiteln."],
+        ["Schnell und einfach", "Link kopieren, App öffnen – sie erkennt ihn. Oder ein Video direkt an VideoFix teilen."],
+        ["Download im Hintergrund", "Handy weiter benutzen; der Fortschritt steht in den Benachrichtigungen."],
+        ["Schneiden", "Nur den Teil behalten, den du willst, und speichern oder teilen."],
+        ["Teilen in Stücke", "Lange Videos in Teile schneiden – ideal für den WhatsApp-Status."],
+        ["Ton extrahieren", "Aus jedem Video eine Audiodatei machen."],
+        ["Mediathek & Player", "Alle Videos an einem Ort, mit eingebautem Player."],
+        ["KI-Audiobeschreibung", "Gemini beschreibt das Video für blinde und sehbehinderte Menschen."],
+        ["Arabisch, Englisch, Deutsch", "Dazu Dunkelmodus und automatische Updates."],
+      ],
       allVersions: "Alle Versionen auf GitHub",
       version: "Version",
     },
@@ -191,6 +228,7 @@
   let lang = "ar";
   let pickedAbi = "arm64-v8a";
   let release = null; // { tag, sizes: {name: bytes} } once GitHub answers
+  let autoStarted = false;
 
   const mb = bytes => Math.round(bytes / 1048576) + " MB";
 
@@ -213,13 +251,26 @@
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
     document.querySelectorAll("[data-t]").forEach(el => { el.textContent = t[el.dataset.t]; });
+    const grid = document.getElementById("features");
+    grid.replaceChildren(...t.features.map(([title, text]) => {
+      const card = document.createElement("div");
+      card.className = "feature";
+      card.append(Object.assign(document.createElement("b"), { textContent: title }),
+                  Object.assign(document.createElement("span"), { textContent: text }));
+      return card;
+    }));
     document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === lang));
 
     const picked = FILES.find(f => f.abi === pickedAbi);
     document.getElementById("mainLink").href = fileUrl(picked.name);
     const size = release?.sizes[picked.name];
-    document.getElementById("mainMeta").textContent =
-      [t.forDevice, release && `${t.version} ${release.tag}`, size && mb(size)].filter(Boolean).join(" · ");
+    const versionInfo = [release && `${t.version} ${release.tag}`, size && mb(size)];
+    document.getElementById("mainMeta").textContent = autoStarted
+      ? t.started
+      : [t.forDevice, ...versionInfo].filter(Boolean).join(" · ");
+    // Desktop: the arm64 APK fits nearly every phone, for copying over by cable or messenger.
+    document.getElementById("desktopLink").href = fileUrl(FILES[0].name);
+    document.getElementById("desktopMeta").textContent = [t.forPhones, ...versionInfo].filter(Boolean).join(" · ");
 
     document.getElementById("fileList").innerHTML = FILES.map(f => {
       const s = release?.sizes[f.name];
@@ -242,11 +293,25 @@
     render();
   }));
 
+  // Opening the page on a phone starts the download right away — but only on the first visit
+  // in this tab, so a reload or language switch doesn't download the APK a second time.
+  function startDownloadOnce() {
+    try {
+      if (sessionStorage.getItem("autoDownloaded")) return;
+      sessionStorage.setItem("autoDownloaded", "1");
+    } catch (_) { /* storage blocked: still download once per page load */ }
+    autoStarted = true;
+    const picked = FILES.find(f => f.abi === pickedAbi);
+    setTimeout(() => { location.href = fileUrl(picked.name); }, 600);
+  }
+
   (async () => {
     lang = pickLanguage();
     document.getElementById(isAndroid ? "android" : "other").hidden = false;
-    if (isAndroid) pickedAbi = await detectAbi();
-    else if (window.QRCode) new QRCode(document.getElementById("qr"), { text: location.href, width: 180, height: 180 });
+    if (isAndroid) {
+      pickedAbi = await detectAbi();
+      startDownloadOnce();
+    } else if (window.QRCode) new QRCode(document.getElementById("qr"), { text: location.href, width: 180, height: 180 });
     render();
     try {
       const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
