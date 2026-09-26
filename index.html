@@ -31,6 +31,8 @@
   .logo { width: 88px; height: 88px; border-radius: 22px; background: var(--accent); display: inline-grid; place-items: center; }
   h1 { font-size: 32px; margin: 16px 0 4px; }
   .tagline { color: var(--muted); margin: 0 0 28px; }
+  .count { display: inline-block; margin: -12px 0 24px; padding: 6px 14px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); font-size: 15px; }
+  .count b { color: var(--accent); }
   .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: center; }
   .download {
     display: block; width: 100%; padding: 16px; border-radius: 14px; border: 0;
@@ -72,6 +74,7 @@
     </div>
     <h1>VideoFix</h1>
     <p class="tagline" data-t="tagline"></p>
+    <p class="count" id="count" hidden></p>
   </header>
 
   <section class="card">
@@ -156,6 +159,7 @@
       ],
       allVersions: "كل الإصدارات على GitHub",
       version: "الإصدار",
+      downloads: n => `<b>${n.toLocaleString("ar")}</b> تنزيل`,
     },
     en: {
       tagline: "Download videos, trim and split them, extract the audio — on Android.",
@@ -188,6 +192,7 @@
       ],
       allVersions: "All versions on GitHub",
       version: "Version",
+      downloads: n => `<b>${n.toLocaleString("en")}</b> downloads`,
     },
     de: {
       tagline: "Videos herunterladen, schneiden, teilen und den Ton extrahieren – auf Android.",
@@ -220,6 +225,7 @@
       ],
       allVersions: "Alle Versionen auf GitHub",
       version: "Version",
+      downloads: n => `<b>${n.toLocaleString("de")}</b> Downloads`,
     },
   };
 
@@ -228,6 +234,7 @@
   let lang = "ar";
   let pickedAbi = "arm64-v8a";
   let release = null; // { tag, sizes: {name: bytes} } once GitHub answers
+  let totalDownloads = null; // every APK download across all releases
   let autoStarted = false;
 
   const mb = bytes => Math.round(bytes / 1048576) + " MB";
@@ -260,6 +267,10 @@
       return card;
     }));
     document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === lang));
+
+    const count = document.getElementById("count");
+    count.hidden = totalDownloads === null;
+    if (totalDownloads !== null) count.innerHTML = t.downloads(totalDownloads);
 
     const picked = FILES.find(f => f.abi === pickedAbi);
     document.getElementById("mainLink").href = fileUrl(picked.name);
@@ -314,10 +325,13 @@
     } else if (window.QRCode) new QRCode(document.getElementById("qr"), { text: location.href, width: 180, height: 180 });
     render();
     try {
-      const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
+      // One request gives both: the newest release (list is newest first) and all download counts.
+      const res = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=100`);
       if (res.ok) {
-        const data = await res.json();
-        release = { tag: data.tag_name.replace(/^v/i, ""), sizes: Object.fromEntries(data.assets.map(a => [a.name, a.size])) };
+        const all = (await res.json()).filter(r => !r.draft && !r.prerelease);
+        totalDownloads = all.flatMap(r => r.assets).reduce((sum, a) => sum + a.download_count, 0);
+        const latest = all[0];
+        if (latest) release = { tag: latest.tag_name.replace(/^v/i, ""), sizes: Object.fromEntries(latest.assets.map(a => [a.name, a.size])) };
         render();
       }
     } catch (_) { /* offline or rate-limited: links still work, just no size/version */ }
