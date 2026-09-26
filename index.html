@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VideoFix</title>
+<meta name="description" content="VideoFix – download videos, trim, split and extract audio on Android.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%236d4aff'/%3E%3Cpath d='M38 30v40l32-20z' fill='white'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f6f5fb; --card: #ffffff; --text: #17152b; --muted: #5d5a73;
+    --accent: #6d4aff; --accent-text: #ffffff; --border: #e3e0f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f0e17; --card: #1a1826; --text: #f1effa; --muted: #a7a3bd; --accent: #8b6dff; --border: #2c2940; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", Tahoma, sans-serif;
+    line-height: 1.55;
+  }
+  main { max-width: 560px; margin: 0 auto; padding: 32px 16px 48px; }
+  .lang { display: flex; gap: 6px; justify-content: center; margin-bottom: 28px; }
+  .lang button {
+    border: 1px solid var(--border); background: var(--card); color: var(--muted);
+    padding: 6px 12px; border-radius: 999px; font: inherit; font-size: 14px; cursor: pointer;
+  }
+  .lang button[aria-pressed="true"] { color: var(--text); border-color: var(--accent); }
+  header { text-align: center; }
+  .logo { width: 88px; height: 88px; border-radius: 22px; background: var(--accent); display: inline-grid; place-items: center; }
+  h1 { font-size: 32px; margin: 16px 0 4px; }
+  .tagline { color: var(--muted); margin: 0 0 28px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; text-align: center; }
+  .download {
+    display: block; width: 100%; padding: 16px; border-radius: 14px; border: 0;
+    background: var(--accent); color: var(--accent-text); font: inherit; font-size: 19px; font-weight: 600;
+    text-decoration: none;
+  }
+  .meta { color: var(--muted); font-size: 14px; margin-top: 10px; }
+  #qr { display: inline-block; background: #fff; padding: 12px; border-radius: 12px; margin: 16px 0 4px; }
+  #qr img, #qr canvas { display: block; }
+  details { margin-top: 18px; text-align: start; }
+  summary { cursor: pointer; color: var(--muted); font-size: 15px; }
+  ul.files { list-style: none; padding: 0; margin: 12px 0 0; }
+  ul.files li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border); font-size: 15px; }
+  ul.files a { color: var(--accent); text-decoration: none; font-weight: 600; white-space: nowrap; }
+  ul.files span { color: var(--muted); }
+  h2 { font-size: 18px; margin: 32px 0 10px; }
+  ol, .features { padding-inline-start: 22px; margin: 0; }
+  ol li, .features li { margin: 6px 0; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 40px; }
+  footer a { color: inherit; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <nav class="lang" aria-label="Language">
+    <button type="button" data-lang="ar">العربية</button>
+    <button type="button" data-lang="en">English</button>
+    <button type="button" data-lang="de">Deutsch</button>
+  </nav>
+
+  <header>
+    <div class="logo" aria-hidden="true">
+      <svg width="44" height="44" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff"/></svg>
+    </div>
+    <h1>VideoFix</h1>
+    <p class="tagline" data-t="tagline"></p>
+  </header>
+
+  <section class="card">
+    <!-- Android: one button, pre-picked for this phone -->
+    <div id="android" hidden>
+      <a class="download" id="mainLink" href="#" data-t="download"></a>
+      <div class="meta" id="mainMeta"></div>
+    </div>
+    <!-- Anything else: point to a phone -->
+    <div id="other" hidden>
+      <p data-t="openOnPhone"></p>
+      <div id="qr" aria-hidden="true"></div>
+      <div class="meta" data-t="scan"></div>
+    </div>
+
+    <details>
+      <summary data-t="otherDevices"></summary>
+      <ul class="files" id="fileList"></ul>
+    </details>
+  </section>
+
+  <h2 data-t="installTitle"></h2>
+  <ol>
+    <li data-t="step1"></li>
+    <li data-t="step2"></li>
+    <li data-t="step3"></li>
+  </ol>
+
+  <h2 data-t="featuresTitle"></h2>
+  <ul class="features">
+    <li data-t="f1"></li>
+    <li data-t="f2"></li>
+    <li data-t="f3"></li>
+    <li data-t="f4"></li>
+  </ul>
+
+  <footer>
+    <a href="https://github.com/Ezeddin-20/VideoFix/releases" data-t="allVersions"></a>
+  </footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  const REPO = "Ezeddin-20/VideoFix";
+  // "latest/download/<name>" always resolves to the newest release, so this page never
+  // needs editing for an update — as long as the APK file names stay the same.
+  const fileUrl = name => `https://github.com/${REPO}/releases/latest/download/${name}`;
+  const FILES = [
+    { abi: "arm64-v8a",   name: "app-arm64-v8a-release.apk" },
+    { abi: "armeabi-v7a", name: "app-armeabi-v7a-release.apk" },
+    { abi: "x86_64",      name: "app-x86_64-release.apk" },
+    { abi: "x86",         name: "app-x86-release.apk" },
+    { abi: "universal",   name: "app-universal-release.apk" },
+  ];
+
+  const T = {
+    ar: {
+      tagline: "نزّل الفيديوهات، قصّها وقسّمها، واستخرج الصوت — على أندرويد.",
+      download: "تنزيل VideoFix",
+      forDevice: "مناسب لهاتفك",
+      openOnPhone: "VideoFix تطبيق لهواتف أندرويد. افتح هذه الصفحة من هاتفك للتنزيل.",
+      scan: "امسح الرمز بكاميرا الهاتف",
+      otherDevices: "أجهزة أخرى / كل الملفات",
+      desc: { "arm64-v8a": "معظم الهواتف الحديثة", "armeabi-v7a": "هواتف قديمة (32-بت)", "x86_64": "محاكي 64-بت", "x86": "محاكي 32-بت", "universal": "كل الأجهزة (حجم كبير)" },
+      installTitle: "طريقة التثبيت",
+      step1: "اضغط على زر التنزيل وانتظر حتى ينتهي.",
+      step2: "افتح الملف. إذا طلب الهاتف ذلك، اسمح بـ «التثبيت من هذا المصدر».",
+      step3: "اضغط «تثبيت». التحديثات القادمة تصلك من داخل التطبيق.",
+      featuresTitle: "ماذا يفعل VideoFix؟",
+      f1: "تنزيل من يوتيوب وتيك توك وإنستغرام وفيسبوك وغيرها — حتى قوائم التشغيل كاملة.",
+      f2: "اختيار الجودة، أو تنزيل الصوت فقط.",
+      f3: "قص الفيديو وتقسيمه واستخراج الصوت منه.",
+      f4: "تحديثات تلقائية من داخل التطبيق.",
+      allVersions: "كل الإصدارات على GitHub",
+      version: "الإصدار",
+    },
+    en: {
+      tagline: "Download videos, trim and split them, extract the audio — on Android.",
+      download: "Download VideoFix",
+      forDevice: "Picked for your phone",
+      openOnPhone: "VideoFix is an Android app. Open this page on your phone to download it.",
+      scan: "Scan with your phone's camera",
+      otherDevices: "Other devices / all files",
+      desc: { "arm64-v8a": "Most modern phones", "armeabi-v7a": "Older phones (32-bit)", "x86_64": "Emulator 64-bit", "x86": "Emulator 32-bit", "universal": "Every device (large)" },
+      installTitle: "How to install",
+      step1: "Tap the download button and wait until it finishes.",
+      step2: "Open the file. If your phone asks, allow “Install from this source”.",
+      step3: "Tap “Install”. Future updates arrive inside the app.",
+      featuresTitle: "What does VideoFix do?",
+      f1: "Download from YouTube, TikTok, Instagram, Facebook and more — even whole playlists.",
+      f2: "Choose the quality, or download just the audio.",
+      f3: "Trim, split and extract audio from your videos.",
+      f4: "Automatic updates from inside the app.",
+      allVersions: "All versions on GitHub",
+      version: "Version",
+    },
+    de: {
+      tagline: "Videos herunterladen, schneiden, teilen und den Ton extrahieren – auf Android.",
+      download: "VideoFix herunterladen",
+      forDevice: "Passend für dein Handy",
+      openOnPhone: "VideoFix ist eine Android-App. Öffne diese Seite auf deinem Handy, um sie herunterzuladen.",
+      scan: "Mit der Handy-Kamera scannen",
+      otherDevices: "Andere Geräte / alle Dateien",
+      desc: { "arm64-v8a": "Die meisten aktuellen Handys", "armeabi-v7a": "Ältere Handys (32-Bit)", "x86_64": "Emulator 64-Bit", "x86": "Emulator 32-Bit", "universal": "Alle Geräte (groß)" },
+      installTitle: "So installierst du es",
+      step1: "Tippe auf den Download-Knopf und warte, bis er fertig ist.",
+      step2: "Öffne die Datei. Falls das Handy fragt, erlaube „Aus dieser Quelle installieren“.",
+      step3: "Tippe auf „Installieren“. Künftige Updates kommen direkt in der App.",
+      featuresTitle: "Was kann VideoFix?",
+      f1: "Download von YouTube, TikTok, Instagram, Facebook und mehr – auch ganze Playlists.",
+      f2: "Qualität wählen oder nur den Ton herunterladen.",
+      f3: "Videos schneiden, teilen und den Ton extrahieren.",
+      f4: "Automatische Updates direkt in der App.",
+      allVersions: "Alle Versionen auf GitHub",
+      version: "Version",
+    },
+  };
+
+  const ua = navigator.userAgent;
+  const isAndroid = /Android/i.test(ua);
+  let lang = "ar";
+  let pickedAbi = "arm64-v8a";
+  let release = null; // { tag, sizes: {name: bytes} } once GitHub answers
+
+  const mb = bytes => Math.round(bytes / 1048576) + " MB";
+
+  // Browsers don't reliably expose the CPU; arm64 runs on almost every phone from the last
+  // years, so it's the default and only clear hints of something else override it.
+  async function detectAbi() {
+    if (/x86_64|x64|amd64/i.test(ua)) return "x86_64";
+    if (/i686|x86/i.test(ua)) return "x86";
+    if (/armv7|armv8l/i.test(ua)) return "armeabi-v7a";
+    try {
+      const hints = await navigator.userAgentData?.getHighEntropyValues(["architecture", "bitness"]);
+      if (hints?.architecture === "x86") return hints.bitness === "32" ? "x86" : "x86_64";
+      if (hints?.bitness === "32") return "armeabi-v7a";
+    } catch (_) { /* no client hints */ }
+    return "arm64-v8a";
+  }
+
+  function render() {
+    const t = T[lang];
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    document.querySelectorAll("[data-t]").forEach(el => { el.textContent = t[el.dataset.t]; });
+    document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === lang));
+
+    const picked = FILES.find(f => f.abi === pickedAbi);
+    document.getElementById("mainLink").href = fileUrl(picked.name);
+    const size = release?.sizes[picked.name];
+    document.getElementById("mainMeta").textContent =
+      [t.forDevice, release && `${t.version} ${release.tag}`, size && mb(size)].filter(Boolean).join(" · ");
+
+    document.getElementById("fileList").innerHTML = FILES.map(f => {
+      const s = release?.sizes[f.name];
+      return `<li><span>${t.desc[f.abi]}${s ? " · " + mb(s) : ""}</span><a href="${fileUrl(f.name)}">${f.abi}</a></li>`;
+    }).join("");
+  }
+
+  function pickLanguage() {
+    try {
+      const saved = localStorage.getItem("lang");
+      if (saved && T[saved]) return saved;
+    } catch (_) {}
+    const nav = (navigator.language || "ar").slice(0, 2);
+    return T[nav] ? nav : "en";
+  }
+
+  document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => {
+    lang = b.dataset.lang;
+    try { localStorage.setItem("lang", lang); } catch (_) {}
+    render();
+  }));
+
+  (async () => {
+    lang = pickLanguage();
+    document.getElementById(isAndroid ? "android" : "other").hidden = false;
+    if (isAndroid) pickedAbi = await detectAbi();
+    else if (window.QRCode) new QRCode(document.getElementById("qr"), { text: location.href, width: 180, height: 180 });
+    render();
+    try {
+      const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
+      if (res.ok) {
+        const data = await res.json();
+        release = { tag: data.tag_name.replace(/^v/i, ""), sizes: Object.fromEntries(data.assets.map(a => [a.name, a.size])) };
+        render();
+      }
+    } catch (_) { /* offline or rate-limited: links still work, just no size/version */ }
+  })();
+</script>
+</body>
+</html>
