@@ -130,7 +130,6 @@
       tagline: "نزّل الفيديوهات، قصّها وقسّمها، واستخرج الصوت — على أندرويد.",
       download: "تنزيل VideoFix",
       forDevice: "مناسب لهاتفك",
-      started: "بدأ التنزيل تلقائياً — إذا لم يبدأ، اضغط الزر.",
       forPhones: "لمعظم هواتف أندرويد",
       openOnPhone: "أو افتح هذه الصفحة مباشرة من هاتفك:",
       scan: "امسح الرمز بكاميرا الهاتف",
@@ -163,7 +162,6 @@
       tagline: "Download videos, trim and split them, extract the audio — on Android.",
       download: "Download VideoFix",
       forDevice: "Picked for your phone",
-      started: "Download started automatically — if not, tap the button.",
       forPhones: "For most Android phones",
       openOnPhone: "Or open this page directly on your phone:",
       scan: "Scan with your phone's camera",
@@ -196,7 +194,6 @@
       tagline: "Videos herunterladen, schneiden, teilen und den Ton extrahieren – auf Android.",
       download: "VideoFix herunterladen",
       forDevice: "Passend für dein Handy",
-      started: "Der Download startet automatisch – falls nicht, tippe auf den Knopf.",
       forPhones: "Für die meisten Android-Handys",
       openOnPhone: "Oder öffne diese Seite direkt auf deinem Handy:",
       scan: "Mit der Handy-Kamera scannen",
@@ -233,7 +230,6 @@
   let pickedAbi = "arm64-v8a";
   let release = null; // { tag, sizes: {name: bytes} } once GitHub answers
   let totalDownloads = null; // every APK download across all releases
-  let autoStarted = false;
 
   const mb = bytes => Math.round(bytes / 1048576) + " MB";
 
@@ -273,9 +269,7 @@
     document.getElementById("mainLink").href = fileUrl(picked.name);
     const size = release?.sizes[picked.name];
     const versionInfo = [release && `${t.version} ${release.tag}`, size && mb(size)];
-    document.getElementById("mainMeta").textContent = autoStarted
-      ? t.started
-      : [t.forDevice, ...versionInfo].filter(Boolean).join(" · ");
+    document.getElementById("mainMeta").textContent = [t.forDevice, ...versionInfo].filter(Boolean).join(" · ");
     // Desktop: the arm64 APK fits nearly every phone, for copying over by cable or messenger.
     document.getElementById("desktopLink").href = fileUrl(FILES[0].name);
     document.getElementById("desktopMeta").textContent = [t.forPhones, ...versionInfo].filter(Boolean).join(" · ");
@@ -301,25 +295,11 @@
     render();
   }));
 
-  // Opening the page on a phone starts the download right away — but only on the first visit
-  // in this tab, so a reload or language switch doesn't download the APK a second time.
-  function startDownloadOnce() {
-    try {
-      if (sessionStorage.getItem("autoDownloaded")) return;
-      sessionStorage.setItem("autoDownloaded", "1");
-    } catch (_) { /* storage blocked: still download once per page load */ }
-    autoStarted = true;
-    const picked = FILES.find(f => f.abi === pickedAbi);
-    setTimeout(() => { location.href = fileUrl(picked.name); }, 600);
-  }
-
   (async () => {
     lang = pickLanguage();
     document.getElementById(isAndroid ? "android" : "other").hidden = false;
-    if (isAndroid) {
-      pickedAbi = await detectAbi();
-      startDownloadOnce();
-    } else if (window.QRCode) new QRCode(document.getElementById("qr"), { text: location.href, width: 180, height: 180 });
+    if (isAndroid) pickedAbi = await detectAbi();
+    else if (window.QRCode) new QRCode(document.getElementById("qr"), { text: location.href, width: 180, height: 180 });
     render();
     try {
       // One request gives both: the newest release (list is newest first) and all download counts.
