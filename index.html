@@ -108,9 +108,6 @@
   <h2 data-t="featuresTitle"></h2>
   <div class="grid" id="features"></div>
 
-  <footer>
-    <a href="https://github.com/Ezeddin-20/VideoFix/releases" data-t="allVersions"></a>
-  </footer>
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -122,10 +119,11 @@
   const FILES = [
     { abi: "arm64-v8a",   name: "app-arm64-v8a-release.apk" },
     { abi: "armeabi-v7a", name: "app-armeabi-v7a-release.apk" },
-    { abi: "x86_64",      name: "app-x86_64-release.apk" },
-    { abi: "x86",         name: "app-x86-release.apk" },
     { abi: "universal",   name: "app-universal-release.apk" },
   ];
+  // Only these are listed under "other devices"; the x86 builds are still published (the
+  // in-app updater and emulators use them) but would just confuse people on this page.
+  const LISTED = ["armeabi-v7a", "universal"];
 
   const T = {
     ar: {
@@ -136,8 +134,9 @@
       forPhones: "لمعظم هواتف أندرويد",
       openOnPhone: "أو افتح هذه الصفحة مباشرة من هاتفك:",
       scan: "امسح الرمز بكاميرا الهاتف",
-      otherDevices: "أجهزة أخرى / كل الملفات",
-      desc: { "arm64-v8a": "معظم الهواتف الحديثة", "armeabi-v7a": "هواتف قديمة (32-بت)", "x86_64": "محاكي 64-بت", "x86": "محاكي 32-بت", "universal": "كل الأجهزة (حجم كبير)" },
+      otherDevices: "إذا لم يعمل التطبيق",
+      get: "تنزيل",
+      desc: { "armeabi-v7a": "نسخة للهواتف القديمة", "universal": "نسخة لكل الأجهزة (حجم أكبر)" },
       installTitle: "طريقة التثبيت",
       step1: "اضغط على زر التنزيل وانتظر حتى ينتهي.",
       step2: "افتح الملف. إذا طلب الهاتف ذلك، اسمح بـ «التثبيت من هذا المصدر».",
@@ -157,7 +156,6 @@
         ["وصف صوتي بالذكاء الاصطناعي", "Gemini يصف الفيديو للمكفوفين وضعاف البصر."],
         ["عربي وإنجليزي وألماني", "مع الوضع الليلي والتحديثات التلقائية."],
       ],
-      allVersions: "كل الإصدارات على GitHub",
       version: "الإصدار",
       downloads: n => `<b>${n.toLocaleString("ar")}</b> تنزيل`,
     },
@@ -169,8 +167,9 @@
       forPhones: "For most Android phones",
       openOnPhone: "Or open this page directly on your phone:",
       scan: "Scan with your phone's camera",
-      otherDevices: "Other devices / all files",
-      desc: { "arm64-v8a": "Most modern phones", "armeabi-v7a": "Older phones (32-bit)", "x86_64": "Emulator 64-bit", "x86": "Emulator 32-bit", "universal": "Every device (large)" },
+      otherDevices: "If the app doesn't work",
+      get: "Download",
+      desc: { "armeabi-v7a": "Version for older phones", "universal": "Version for every device (larger)" },
       installTitle: "How to install",
       step1: "Tap the download button and wait until it finishes.",
       step2: "Open the file. If your phone asks, allow “Install from this source”.",
@@ -190,7 +189,6 @@
         ["AI audio description", "Gemini describes the video for blind and low-vision viewers."],
         ["Arabic, English, German", "Plus dark mode and automatic updates."],
       ],
-      allVersions: "All versions on GitHub",
       version: "Version",
       downloads: n => `<b>${n.toLocaleString("en")}</b> downloads`,
     },
@@ -202,8 +200,9 @@
       forPhones: "Für die meisten Android-Handys",
       openOnPhone: "Oder öffne diese Seite direkt auf deinem Handy:",
       scan: "Mit der Handy-Kamera scannen",
-      otherDevices: "Andere Geräte / alle Dateien",
-      desc: { "arm64-v8a": "Die meisten aktuellen Handys", "armeabi-v7a": "Ältere Handys (32-Bit)", "x86_64": "Emulator 64-Bit", "x86": "Emulator 32-Bit", "universal": "Alle Geräte (groß)" },
+      otherDevices: "Falls die App nicht läuft",
+      get: "Laden",
+      desc: { "armeabi-v7a": "Version für ältere Handys", "universal": "Version für alle Geräte (größer)" },
       installTitle: "So installierst du es",
       step1: "Tippe auf den Download-Knopf und warte, bis er fertig ist.",
       step2: "Öffne die Datei. Falls das Handy fragt, erlaube „Aus dieser Quelle installieren“.",
@@ -223,7 +222,6 @@
         ["KI-Audiobeschreibung", "Gemini beschreibt das Video für blinde und sehbehinderte Menschen."],
         ["Arabisch, Englisch, Deutsch", "Dazu Dunkelmodus und automatische Updates."],
       ],
-      allVersions: "Alle Versionen auf GitHub",
       version: "Version",
       downloads: n => `<b>${n.toLocaleString("de")}</b> Downloads`,
     },
@@ -242,12 +240,11 @@
   // Browsers don't reliably expose the CPU; arm64 runs on almost every phone from the last
   // years, so it's the default and only clear hints of something else override it.
   async function detectAbi() {
-    if (/x86_64|x64|amd64/i.test(ua)) return "x86_64";
-    if (/i686|x86/i.test(ua)) return "x86";
+    if (/x86|x64|amd64|i686/i.test(ua)) return "universal";
     if (/armv7|armv8l/i.test(ua)) return "armeabi-v7a";
     try {
       const hints = await navigator.userAgentData?.getHighEntropyValues(["architecture", "bitness"]);
-      if (hints?.architecture === "x86") return hints.bitness === "32" ? "x86" : "x86_64";
+      if (hints?.architecture === "x86") return "universal";
       if (hints?.bitness === "32") return "armeabi-v7a";
     } catch (_) { /* no client hints */ }
     return "arm64-v8a";
@@ -283,9 +280,9 @@
     document.getElementById("desktopLink").href = fileUrl(FILES[0].name);
     document.getElementById("desktopMeta").textContent = [t.forPhones, ...versionInfo].filter(Boolean).join(" · ");
 
-    document.getElementById("fileList").innerHTML = FILES.map(f => {
+    document.getElementById("fileList").innerHTML = FILES.filter(f => LISTED.includes(f.abi)).map(f => {
       const s = release?.sizes[f.name];
-      return `<li><span>${t.desc[f.abi]}${s ? " · " + mb(s) : ""}</span><a href="${fileUrl(f.name)}">${f.abi}</a></li>`;
+      return `<li><span>${t.desc[f.abi]}${s ? " · " + mb(s) : ""}</span><a href="${fileUrl(f.name)}">${t.get}</a></li>`;
     }).join("");
   }
 
