@@ -55,6 +55,9 @@
   .feature { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
   .feature b { display: block; margin-bottom: 2px; }
   .feature span { color: var(--muted); font-size: 15px; }
+  .telegram { margin-top: 32px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px 24px 24px; text-align: center; }
+  .telegram h2 { margin-top: 0; }
+  .telegram p { color: var(--muted); margin: 0 0 16px; }
   footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 40px; }
   footer a { color: inherit; }
   [hidden] { display: none !important; }
@@ -103,10 +106,18 @@
     <li data-t="step1"></li>
     <li data-t="step2"></li>
     <li data-t="step3"></li>
+    <li data-t="step4"></li>
   </ol>
 
   <h2 data-t="featuresTitle"></h2>
   <div class="grid" id="features"></div>
+
+  <section class="telegram" aria-labelledby="tgTitle">
+    <h2 id="tgTitle" data-t="tgTitle"></h2>
+    <p data-t="tgText"></p>
+    <a class="download" href="https://t.me/EzTechApps" data-t="tgButton"></a>
+  </section>
+  <footer data-t="footer"></footer>
 
 </main>
 
@@ -117,9 +128,9 @@
   // needs editing for an update — as long as the APK file names stay the same.
   const fileUrl = name => `https://github.com/${REPO}/releases/latest/download/${name}`;
   const FILES = [
-    { abi: "arm64-v8a",   name: "app-arm64-v8a-release.apk" },
-    { abi: "armeabi-v7a", name: "app-armeabi-v7a-release.apk" },
-    { abi: "universal",   name: "app-universal-release.apk" },
+    { abi: "arm64-v8a",   name: "VideoFix-arm64-v8a.apk" },
+    { abi: "armeabi-v7a", name: "VideoFix-armeabi-v7a.apk" },
+    { abi: "universal",   name: "VideoFix-universal.apk" },
   ];
   // Listed under "if the app doesn't work"; arm64 is the main button.
   const LISTED = ["armeabi-v7a", "universal"];
@@ -138,7 +149,12 @@
       installTitle: "طريقة التثبيت",
       step1: "اضغط على زر التنزيل وانتظر حتى ينتهي.",
       step2: "افتح الملف. إذا طلب الهاتف ذلك، اسمح بـ «التثبيت من هذا المصدر».",
-      step3: "اضغط «تثبيت». التحديثات القادمة تصلك من داخل التطبيق.",
+      step3: "إذا ظهرت رسالة من Google Play Protect تقول إن التطبيق غير معروف أو تنصح بفحصه، فهذا طبيعي لأن التطبيق لا يُنزَّل من متجر Google Play. التطبيق آمن ومجاني: اضغط «مزيد من التفاصيل» ثم «التثبيت على أي حال».",
+      step4: "اضغط «تثبيت». التحديثات القادمة تصلك من داخل التطبيق.",
+      tgTitle: "انضم إلى قناتي على تيليجرام",
+      tgText: "لتقترح تطبيقات جديدة، وتحمّل كل تطبيقاتي، وتتابع التحديثات أولاً بأول.",
+      tgButton: "الانضمام إلى القناة",
+      footer: "تطوير عز الدين",
       featuresTitle: "ماذا يفعل VideoFix؟",
       features: [
         ["تنزيل من كل مكان", "يوتيوب وتيك توك وإنستغرام وفيسبوك ومئات المواقع الأخرى."],
@@ -170,7 +186,12 @@
       installTitle: "How to install",
       step1: "Tap the download button and wait until it finishes.",
       step2: "Open the file. If your phone asks, allow “Install from this source”.",
-      step3: "Tap “Install”. Future updates arrive inside the app.",
+      step3: "If a Google Play Protect message says the app is unknown or suggests scanning it, that is normal: the app doesn't come from the Google Play Store. It is safe and free: tap “More details”, then “Install anyway”.",
+      step4: "Tap “Install”. Future updates arrive inside the app.",
+      tgTitle: "Join my Telegram channel",
+      tgText: "Suggest new apps, download all my apps and get the updates first.",
+      tgButton: "Join the channel",
+      footer: "Developed by Ez Eddin",
       featuresTitle: "What does VideoFix do?",
       features: [
         ["Download from anywhere", "YouTube, TikTok, Instagram, Facebook and hundreds more sites."],
@@ -202,7 +223,12 @@
       installTitle: "So installierst du es",
       step1: "Tippe auf den Download-Knopf und warte, bis er fertig ist.",
       step2: "Öffne die Datei. Falls das Handy fragt, erlaube „Aus dieser Quelle installieren“.",
-      step3: "Tippe auf „Installieren“. Künftige Updates kommen direkt in der App.",
+      step3: "Wenn eine Meldung von Google Play Protect sagt, die App sei unbekannt, oder einen Scan vorschlägt, ist das normal: Die App kommt nicht aus dem Google Play Store. Sie ist sicher und kostenlos: Tippe auf „Weitere Details“ und dann auf „Trotzdem installieren“.",
+      step4: "Tippe auf „Installieren“. Künftige Updates kommen direkt in der App.",
+      tgTitle: "Tritt meinem Telegram-Kanal bei",
+      tgText: "Schlag neue Apps vor, lade alle meine Apps herunter und bekomm die Updates als Erste:r.",
+      tgButton: "Dem Kanal beitreten",
+      footer: "Entwickelt von Ez Eddin",
       featuresTitle: "Was kann VideoFix?",
       features: [
         ["Von überall herunterladen", "YouTube, TikTok, Instagram, Facebook und Hunderte weitere Seiten."],
